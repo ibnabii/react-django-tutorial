@@ -1,0 +1,6 @@
+music_controller/db.sqlite3
+*/__pycache__
+.venv
+.idea
+music_controller/frontend/node_modules
+music_controller/frontend/package-lock.json
