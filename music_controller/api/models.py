@@ -11,10 +11,11 @@ def generate_unique_code():
         code = "".join(random.choices(string.ascii_uppercase, k=length))
         if not Room.objects.filter(code=code).exists():
             break
+    return code
 
 
 class Room(models.Model):
-    code = models.CharField(max_length=8, unique=True)
+    code = models.CharField(max_length=8, unique=True, default=generate_unique_code)
     host = models.CharField(max_length=50, unique=True)
     guest_can_pause = models.BooleanField(default=False, null=False)
     votes_to_skip = models.IntegerField(null=False, default=1)
