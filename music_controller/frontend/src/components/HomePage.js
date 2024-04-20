@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, Navigate } from "react-router-dom";
-import { Grid, Button, ButtonGroup, Typography } from "@material-ui/core";
+import React, {useState, useEffect} from 'react';
+import {BrowserRouter as Router, Routes, Route, Link, Navigate} from "react-router-dom";
+import {Grid, Button, ButtonGroup, Typography} from "@material-ui/core";
 
 import RoomJoinPage from "./RoomJoinPage";
 import CreateRoomPage from "./CreateRoomPage";
@@ -19,6 +19,19 @@ export default function HomePage() {
                 console.error('Error fetching user room code:', error);
             });
     }, []);
+
+    const clearRoomCode = () => setRoomCode(null);
+
+    const checkRoomCode = () => {
+        fetch("/api/user-in-room/")
+            .then((response) => response.json())
+            .then((data) => {
+                setRoomCode(data.code);
+            })
+            .catch((error) => {
+                console.error('Error fetching user room code:', error);
+            });
+    }
 
     const renderHomePage = () => {
         return (
@@ -49,11 +62,13 @@ export default function HomePage() {
             <Routes>
                 <Route
                     path="/"
-                    element={roomCode ? <Navigate to={`/room/${roomCode}`} /> : renderHomePage()}
+                    element={roomCode ? <Navigate to={`/room/${roomCode}`}/> : renderHomePage()}
                 />
-                <Route path="/join/:roomId?" element={<RoomJoinPage />} />
-                <Route path="/create" element={<CreateRoomPage />} />
-                <Route path="/room/:roomCode" element={<Room />} />
+                <Route path="/join/:roomId?" element={<RoomJoinPage/>}/>
+                <Route path="/create" element={<CreateRoomPage checkRoomCallback={checkRoomCode}/>}/>
+                <Route
+                    path="/room/:roomCode"
+                    element={roomCode ? <Room leaveRoomCallback={clearRoomCode}/> : <Navigate to="/"/>}/>
             </Routes>
         </Router>
     );

@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -38,6 +39,7 @@ class JoinRoom(APIView):
     serializer_class = RoomSerializer
     lookup_url_kwarg = "code"
 
+    @csrf_exempt
     def post(self, request, *args, **kwargs):
         if not self.request.session.exists(self.request.session.session_key):
             self.request.session.create()
@@ -104,3 +106,18 @@ class UserInRoom(APIView):
             "code": self.request.session.get("room_code"),
         }
         return JsonResponse(data, status=status.HTTP_200_OK)
+
+
+class LeaveRoom(APIView):
+    @csrf_exempt
+    def post(self, request):
+        if not self.request.session.exists(self.request.session.session_key):
+            self.request.session.create()
+
+        self.request.session["room_code"] = None
+        self.request.session.save()
+        host_id = self.request.session.session_key
+
+        Room.objects.filter(host=host_id).delete()
+
+        return Response({"message": "Room Leaved!"}, status=status.HTTP_200_OK)

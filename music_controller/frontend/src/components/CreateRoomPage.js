@@ -11,7 +11,7 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import { Link } from "react-router-dom";
 
-export default function CreateRoomPage() {
+export default function CreateRoomPage({checkRoomCallback}) {
     const defaultVotes = 2;
     const navigate = useNavigate();
     const [guestCanPause, setGuestCanPause] = useState(true);
@@ -37,7 +37,10 @@ export default function CreateRoomPage() {
         };
         fetch("/api/room-create/", requestOptions)
             .then((response) => response.json())
-            .then((data) => navigate("/room/" + data.code)) // using navigate instead of history.push
+            .then((data) => {
+                checkRoomCallback();
+                navigate("/room/" + data.code);
+            })
             .catch((error) => console.error('Error creating room:', error));
     };
 
